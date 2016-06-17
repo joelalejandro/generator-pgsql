@@ -74,5 +74,6 @@ module.exports = generators.Base.extend({
     mkdirp(this.destinationPath(this.props.dbname));
 
     this.fs.write(this.destinationPath(dbscriptfile), template(this.props));
+    this.config.set('dbname', this.props.dbname);
   }
 })
