@@ -1,0 +1,32 @@
+{
+  "name": "generator-pgsql",
+  "version": "0.0.1",
+  "description": "A Yeoman generator for PostgreSQL database scripts.",
+  "main": "app/index.js",
+  "dependencies": {
+    "yeoman-generator": "^0.23.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joelalejandro/generator-pgsql.git"
+  },
+  "keywords": [
+    "yeoman",
+    "yo",
+    "generator",
+    "postgresql",
+    "postgres",
+    "database",
+    "sql"
+  ],
+  "author": "Joel A. Villarreal Bertoldi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/joelalejandro/generator-pgsql/issues"
+  },
+  "homepage": "https://github.com/joelalejandro/generator-pgsql#readme"
+}
