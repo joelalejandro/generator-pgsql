@@ -1,0 +1,26 @@
+-- <%=dbname%> build script
+-- Created with generator-pgsql
+-- Build date: <%=now%>
+
+--
+-- Database
+--
+<%=databasescript%>
+
+<% if (useschemas) { %>--
+-- Schemas
+--
+
+<% _.forEach(schemascripts, function(schemascript) {%>
+-- Schema: <%=schemascript.name%>
+<%=schemascript.sql%>
+<% })} %>
+
+<% if (usetables) { %>--
+-- Table creation
+--
+
+<% _.forEach(tablescripts, function(tablescript) {%>
+-- Table: <%=tablescript.name%>
+<%=tablescript.sql%>
+<% })} %>
