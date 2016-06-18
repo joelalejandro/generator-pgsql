@@ -1,5 +1,3 @@
-<% if (!userexists) { %>
-CREATE USER <%=username%> WITH PASSWORD '<%=password%>';
-<% } %>
+<% if (!userexists) { %>CREATE USER <%=username%> WITH PASSWORD '<%=password%>';
 
-CREATE DATABASE <%=dbname%> WITH OWNER = <%=username%>;
+<% } %>CREATE DATABASE <%=dbname%> WITH OWNER = <%=username%>;
