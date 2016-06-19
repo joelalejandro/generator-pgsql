@@ -35,6 +35,13 @@ The script is pushed into `{dbname}/schemas/{schemaname}.sql`.
 
 ### yo pgsql:table [tablename] [--inherits &lt;table_list&gt; | --like &lt;source_table&gt;] [--fk]
 Creates a table script.
+
+<pre><code>
+yo pgsql:table [tablename]
+               [--inherits &lt;table_list&gt; | --like &lt;source_table&gt;]
+               [--fk]
+</code></pre>
+
 This generator will prompt:
 
 - A table name
