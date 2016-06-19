@@ -7,6 +7,7 @@
     "yeoman-generator": "^0.23.4"
   },
   "devDependencies": {
+    "chmod": "^0.2.1",
     "lodash": "^4.13.1",
     "mkdirp": "^0.5.1",
     "path-exists": "^3.0.0",
