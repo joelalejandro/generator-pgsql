@@ -33,15 +33,26 @@ This generator will only prompt for a schema name.
 
 The script is pushed into `{dbname}/schemas/{schemaname}.sql`.
 
-### yo pgsql:table [tablename]
+### yo pgsql:table [tablename] [--inherits &lt;table_list&gt; | --like &lt;source_table&gt;] [--fk]
 Creates a table script.
 This generator will prompt:
 
 - A table name
 - Whether the table will live in a schema or not
 - If the table shall be in a schema, such schema's name
+- The column definition for the table (as long as the `--like` flag isn't used)
+- Primary key constraint definition
 
 The script is pushed into `{dbname}/tables/{tablename}.sql`.
+
+#### --inherits
+This flag add the `INHERITS` clause to the `CREATE TABLE` sentence. It accepts a comma-delimited list of tables.
+
+#### --like
+This flag creates a table as a duplicate (`LIKE`) of a given table. It'll skip the column definition input.
+
+#### --fk
+This flag allows to input foreign keys into the `CREATE TABLE` script.
 
 ### yo pgsql:build-script
 Compiles all of the SQL scripts in a single `build.sql` file, in this order:
