@@ -5,7 +5,7 @@ A Yeoman generator for PostgreSQL database scripts.
 `generator-pgsql` will create the following directory structure while working
 with the different generators:
 
-`dbname`
+<pre><code>dbname
 |__ tables
 |   |__ table1.sql
 |   |__ table2.sql
@@ -13,7 +13,7 @@ with the different generators:
 |   |__ schema1.sql
 |__ db.sql
 |__ build.sql
-|__ build.sh
+|__ build.sh</code></pre>
 
 ## Available commands
 
