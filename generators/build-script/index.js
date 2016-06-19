@@ -3,6 +3,7 @@ var _ = require('lodash');
 var pathExists = require('path-exists');
 var readDir = require('read-dir');
 var readFile = require('read-file');
+var chmod = require('chmod');
 
 module.exports = generators.Base.extend({
 
@@ -15,6 +16,7 @@ module.exports = generators.Base.extend({
     var build = {};
 
     build.dbname = this.config.get('dbname');
+    build.username = this.config.get('username');
     build.now = new Date().toString();
 
     var path = {
@@ -44,5 +46,12 @@ module.exports = generators.Base.extend({
     _.forEach(tablefiles, builder('tablescripts'));
 
     this.fs.write(this.destinationPath(buildscriptfile), template(build));
+
+    var bashscriptfile = this.config.get('dbname') + '/build.sh';
+
+    template = _.template(this.fs.read(this.templatePath('build_runner.ejs')));
+
+    this.fs.write(this.destinationPath(bashscriptfile), template(build));
+    chmod(this.destinationPath(bashscriptfile), { execute: true });
   }
 })
