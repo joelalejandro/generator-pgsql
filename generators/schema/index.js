@@ -35,6 +35,12 @@ module.exports = generators.Base.extend({
         validate: function(schemaname) {
           return schemaname !== '' || 'A table name is required.';
         }
+      },
+      {
+        type: 'confirm',
+        name: 'restrict',
+        message: 'Authorize schema to "' + this.config.get('username') + '"?',
+        default: true
       }
     ]).then(function(props) {
       that.props = props;

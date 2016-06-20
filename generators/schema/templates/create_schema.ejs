@@ -1,1 +1,2 @@
-CREATE SCHEMA <%=schemaname%>;
+CREATE SCHEMA IF NOT EXISTS <%=schemaname%>
+<% if (restrict) { %>AUTHORIZATION <%=username%><% } %>;
