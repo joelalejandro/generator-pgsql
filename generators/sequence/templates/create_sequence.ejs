@@ -1,0 +1,5 @@
+CREATE IF NOT EXISTS SEQUENCE <%=(useschema ? (schemaname + '.') : '')%><%=sequencename%>
+INCREMENT BY <%=increment%>
+<%=min ? ('MINVALUE ' + min) : 'NO MINVALUE'%>
+<%=max ? ('MAXVALUE ' + max) : 'NO MAXVALUE'%>
+<%=table ? ('OWNED BY ' + table) : 'OWNED BY NONE'%>;
