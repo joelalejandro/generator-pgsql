@@ -28,7 +28,9 @@ with the different generators:
 |__ recompile.sql
 |__ recompile.sh</code></pre>
 
-## Available commands
+## Available generators
+
+*Quick note:* You can remove any generated script using the `--wipe` flag.
 
 ### yo pgsql [dbname]
 Creates a database script for a database named `dbname`.
