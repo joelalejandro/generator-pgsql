@@ -1,0 +1,6 @@
+<% if (useschema) {%>-- @schema <%=schemaname%><% } %>
+CREATE OR REPLACE VIEW <%=(useschema ? (schemaname + '.') : '')%><%=viewname%> AS
+
+/* Write your query here. */
+
+;
