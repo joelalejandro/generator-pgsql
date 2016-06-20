@@ -20,6 +20,7 @@ with the different generators:
 |   |__ schema1.sql
 |__ views
 |__ functions
+|__ sequences
 |
 |__ db.sql
 |__ build.sql
@@ -85,6 +86,15 @@ Creates a function script, prompting for:
 - Return type
 - Procedural language
 - Security profile
+
+### yo pgsql:sequence
+Creates a sequence script, prompting for:
+
+- The sequence name
+- Whether the sequence will live in a schema or not
+- Minimum and maximum values
+- Increment step
+- Binding to a table column
 
 ### yo pgsql:build-script [--recompile]
 Compiles all of the SQL scripts in a single `build.sql` file, in this order:
