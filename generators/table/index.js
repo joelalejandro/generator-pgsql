@@ -14,7 +14,12 @@ module.exports = generators.Base.extend({
     this.option('like');
     this.option('fk');
 
-    this.props = {};
+    this.props = {
+      columns: [],
+      like: false,
+      inherits: false,
+      foreignkeys: []
+    };
 
     if (typeof this.config.get('dbname') === 'undefined') {
       this.log(_.repeat('-', 75));
@@ -34,6 +39,10 @@ module.exports = generators.Base.extend({
   },
 
   prompting: function() {
+    return this._askTableData();
+  },
+
+  _askTableData: function() {
     var that = this;
     return this.prompt([
       {
@@ -73,26 +82,23 @@ module.exports = generators.Base.extend({
         }
       }
     ]).then(function(props) {
-      that.props = props;
+      that.props.tablename = props.tablename;
+      that.props.useschema = props.useschema;
+      that.props.schemaname = props.schemaname;
       that.props.dbname = that.config.get('dbname');
-      that.props.columns = [];
-      if (that.options.fk) {
-        that.props.foreignkeys = [];
-      }
-    }).then(function() {
       if (!that.options.like) {
         that.log('');
         that.log('You will now define the columns of this table. Once you are done, '
           + 'simply press ENTER without entering a column name.');
         that.log('');
       }
+      return that._askColumn();
     });
   },
 
-  askColumn: function(cb) {
+  _askColumn: function(cb) {
     if (!this.options.like) {
       var that = this;
-
       cb = cb || this.async();
 
       return this.prompt([{
@@ -102,15 +108,17 @@ module.exports = generators.Base.extend({
       }]).then(function(props) {
         if (props.column !== '') {
           that.props.columns.push(props.column);
-          that.askColumn(cb);
+          return that._askColumn(cb);
         } else {
-          cb();
+          return that._askInheritance();
         }
       });
+    } else {
+      return this._askLike();
     }
   },
 
-  askInheritance: function() {
+  _askInheritance: function() {
     var that = this;
     if (this.options.inherits && !this.options.like) {
       this.log('');
@@ -127,10 +135,13 @@ module.exports = generators.Base.extend({
       }]).then(function(props) {
         that.props.inherits = props.inherits;
       });
+    } else {
+      this.props.inherits = false;
+      return this._askLike();
     }
   },
 
-  askLike: function() {
+  _askLike: function() {
     var that = this;
     if (this.options.like && !this.options.inherits) {
       this.log('');
@@ -143,48 +154,55 @@ module.exports = generators.Base.extend({
         default: typeof this.options.like === 'string' ? this.options.like : undefined,
         validate: function(like) {
           return like !== '' || 'A table name must be provided.';
-        }º
+        }
       }]).then(function(props) {
         that.props.like = props.like;
       });
+    } else {
+      this.props.like = false;
+      return this._askPrimaryKey();
     }
   },
 
-  askPrimaryKey: function() {
+  _askPrimaryKey: function() {
     var that = this;
-    this.log('');
-    return this.prompt([
-      {
-        type: 'input',
-        name: 'pkcolumns',
-        message: 'Which column(s) conform the primary key?',
-        validate: function(pkcolumns) {
-          var columns = that.props.columns;
-          return pkcolumns.replace(/ /g, '').split(',').every(function(pk) {
-            return columns.join(',').indexOf(pk) > -1;
-          }) || 'Primary key must contain columns defined in the table.';
+    if (!this.options.like) {
+      this.log('');
+      return this.prompt([
+        {
+          type: 'input',
+          name: 'pkcolumns',
+          message: 'Which column(s) conform the primary key?',
+          validate: function(pkcolumns) {
+            var columns = that.props.columns;
+            return pkcolumns.replace(/ /g, '').split(',').every(function(pk) {
+              return columns.join(',').indexOf(pk) > -1;
+            }) || 'Primary key must contain columns defined in the table.';
+          },
         },
-      },
-      {
-        type: 'input',
-        name: 'pkname',
-        message: 'What is the PK constraint name?',
-        default: 'pk_' + that.props.tablename
-      }
-    ]).then(function(props) {
-      that.props.pkname = props.pkname;
-      that.props.pkcolumns = props.pkcolumns;
-    });
+        {
+          type: 'input',
+          name: 'pkname',
+          message: 'What is the PK constraint name?',
+          default: 'pk_' + that.props.tablename
+        }
+      ]).then(function(props) {
+        that.props.pkname = props.pkname;
+        that.props.pkcolumns = props.pkcolumns;
+        return that._askForeignKey();
+      });
+    } else {
+      return that._askForeignKey();
+    }
   },
 
-  askForeignKey: function(cb) {
+  _askForeignKey: function(cb) {
     var that = this;
-
-    cb = cb || this.async();
 
     this.log('');
 
     if (this.options.fk) {
+      cb = cb || this.async();
       return this.prompt([
         {
           type: 'input',
@@ -229,11 +247,13 @@ module.exports = generators.Base.extend({
           destinationcolumns: props.fkdestination.replace(/ /g, '').split(',')
         });
         if (props.anotherfk) {
-          that.askForeignKey(cb);
+          that._askForeignKey(cb);
         } else {
           cb();
         }
       });
+    } else {
+      this.props.foreignkeys = [];
     }
   },
 
