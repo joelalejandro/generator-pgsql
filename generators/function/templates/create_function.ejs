@@ -1,0 +1,15 @@
+<% if (useschema) {%>-- @schema <%=schemaname%><% } %>
+CREATE OR REPLACE FUNCTION <%=(useschema ? (schemaname + '.') : '')%><%=functionname%>
+(
+<%=parameters.join(','+eol+'  ')%>
+)
+<% if (returns) { %>RETURNS <%=returns%><% } %>
+AS $$
+
+--
+-- Write your function code here.
+--
+
+$$
+LANGUAGE <%=language%>
+SECURITY <%=security%>;
