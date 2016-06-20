@@ -4,23 +4,15 @@ var os = require('os');
 var _ = require('lodash');
 var mkdirp = require('mkdirp');
 
-var getScriptFileName = function(dbname, collection, schemaname, entityname, scripttype) {
-  var pattern = '%(dbname)s/%(collection)s%(schemaname)s%(entityname)s.%(scripttype)s';
-  var vars = {
-    dbname: dbname,
-    collection: collection !== undefined ? (collection + '/') : '',
-    schemaname: schemaname !== undefined ? (schemaname + '/') : '',
-    entityname: entityname,
-    scripttype: scripttype
-  };
-  return printf(pattern, vars);
-}
+var getScriptFileName = require('./get-script-file-name');
 
 var getScriptFilePath = function(filename) {
   return path.dirname(filename);
 }
 
 module.exports = function(generator, settings) {
+  if (generator.options.wipe) return;
+
   if (!settings) {
     generator.env.error('Cannot write script file without the required parameters.');
     return;
