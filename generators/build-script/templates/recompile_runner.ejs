@@ -1,0 +1,19 @@
+#!/bin/bash
+
+DIR="$( cd "$( dirname "$<%='{'%>BASH_SOURCE[0]<%='}'%>" )" && pwd )"
+
+echo "----------------------------------------------------------------"
+echo "<%=dbname%> recompile runner"
+echo "Created with generator-pgsql"
+echo "Build date: <%=now%>"
+echo "----------------------------------------------------------------"
+echo
+echo "----------------------------------------------------------------"
+echo "Recompiling code objects for database <%=dbname%>..."
+echo "----------------------------------------------------------------"
+echo
+$(locate bin/psql) -f $DIR/recompile.sql
+echo
+echo "----------------------------------------------------------------"
+echo "Recompile runner has finished."
+echo "----------------------------------------------------------------"
