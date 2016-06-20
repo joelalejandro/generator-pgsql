@@ -1,0 +1,5 @@
+CREATE IF NOT EXISTS SEQUENCE hr.seq_employees
+INCREMENT BY 1
+NO MINVALUE
+NO MAXVALUE
+OWNED BY hr.employees.employee_id;
