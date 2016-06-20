@@ -8,11 +8,13 @@
   },
   "devDependencies": {
     "chmod": "^0.2.1",
+    "glob": "^7.0.4",
     "lodash": "^4.13.1",
     "mkdirp": "^0.5.1",
     "path-exists": "^3.0.0",
     "read-dir": "^0.2.0",
-    "read-file": "^0.2.0"
+    "read-file": "^0.2.0",
+    "rmdir": "^1.2.0"
   },
   "files": [
     "app/index"
