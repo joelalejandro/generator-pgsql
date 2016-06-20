@@ -8,8 +8,9 @@ var os = require('os');
 var ifNotDatabase = require('/utils/if-not-database');
 var writeScript = require('/utils/write-script');
 var sharedInput = require('/utils/shared-input');
+var wipeableGenerator = require('/utils/wipeable-generator');
 
-module.exports = generators.Base.extend({
+module.exports = wipeableGenerator.extend({
 
   constructor: function() {
     generators.Base.apply(this, arguments);
@@ -39,7 +40,9 @@ module.exports = generators.Base.extend({
   },
 
   prompting: function() {
-    return this._askTableData();
+    if (!this.options.wipe) {
+      return this._askTableData();
+    }
   },
 
   _askTableData: function() {
@@ -225,14 +228,18 @@ module.exports = generators.Base.extend({
   },
 
   writing: function() {
-    writeScript(this, {
-      databaseName: this.props.dbname,
-      entityCollection: 'tables',
-      useSchema: this.props.useschema,
-      schemaName: this.props.schemaname,
-      entityName: this.props.tablename,
-      scriptType: 'sql',
-      templateName: 'create_table'
-    });
+    if (this.options.wipe) {
+      this._wipe(this.tablename, 'tables');
+    } else {
+      writeScript(this, {
+        databaseName: this.props.dbname,
+        entityCollection: 'tables',
+        useSchema: this.props.useschema,
+        schemaName: this.props.schemaname,
+        entityName: this.props.tablename,
+        scriptType: 'sql',
+        templateName: 'create_table'
+      });
+    }
   }
 })

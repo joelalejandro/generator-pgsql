@@ -7,8 +7,9 @@ var mkdirp = require('mkdirp');
 var ifNotDatabase = require('/utils/if-not-database');
 var writeScript = require('/utils/write-script');
 var sharedInput = require('/utils/shared-input');
+var wipeableGenerator = require('/utils/wipeable-generator');
 
-module.exports = generators.Base.extend({
+module.exports = wipeableGenerator.extend({
 
   constructor: function() {
     generators.Base.apply(this, arguments);
@@ -25,25 +26,31 @@ module.exports = generators.Base.extend({
   },
 
   prompting: function() {
-    var that = this;
-    return this.prompt([
-      sharedInput.entityName('view', this.viewname),
-      sharedInput.useSchema('view'),
-      sharedInput.schemaName
-    ]).then(function(props) {
-      that.props = props;
-    });
+    if (!this.options.wipe) {
+      var that = this;
+      return this.prompt([
+        sharedInput.entityName('view', this.viewname),
+        sharedInput.useSchema('view'),
+        sharedInput.schemaName
+      ]).then(function(props) {
+        that.props = props;
+      });
+    }
   },
 
   writing: function() {
-    writeScript(this, {
-      databaseName: this.props.dbname,
-      entityCollection: 'views',
-      useSchema: this.props.useschema,
-      schemaName: this.props.schemaname,
-      entityName: this.props.viewname,
-      scriptType: 'sql',
-      templateName: 'create_view'
-    });
+    if (this.options.wipe) {
+      this._wipe(this.viewname, 'views');
+    } else {
+      writeScript(this, {
+        databaseName: this.props.dbname,
+        entityCollection: 'views',
+        useSchema: this.props.useschema,
+        schemaName: this.props.schemaname,
+        entityName: this.props.viewname,
+        scriptType: 'sql',
+        templateName: 'create_view'
+      });
+    }
   }
 });
