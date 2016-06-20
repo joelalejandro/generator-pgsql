@@ -25,6 +25,15 @@
 <%=tablescript.sql%>
 <% })} %>
 
+<% if (usesequences) { %>--
+-- Sequence creation
+--
+
+<% _.forEach(sequencescripts, function(sequencescript) {%>
+-- Sequence: <%=sequencescript.name%>
+<%=sequencescript.sql%>
+<% })} %>
+
 <% if (useviews) { %>--
 -- View creation
 --
