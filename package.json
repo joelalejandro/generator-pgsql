@@ -33,7 +33,8 @@
     "postgresql",
     "postgres",
     "database",
-    "sql"
+    "sql",
+    "yeoman-generator"
   ],
   "author": "Joel A. Villarreal Bertoldi",
   "license": "MIT",
