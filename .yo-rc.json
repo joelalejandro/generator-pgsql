@@ -1,0 +1,6 @@
+{
+  "generator-pgsql": {
+    "dbname": "demo_database",
+    "username": "dbo_demo_database"
+  }
+}
