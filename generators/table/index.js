@@ -258,12 +258,16 @@ module.exports = generators.Base.extend({
   },
 
   writing: function() {
-    var tblscriptfile = this.props.dbname + '/tables/' + this.props.tablename + '.sql';
+    var tblscriptfile = this.props.dbname + '/tables/'
+                           + (this.props.useschema ? (this.props.schemaname + '/') : '')
+                           + this.props.tablename + '.sql';
+
     var template = _.template(
       this.fs.read(this.templatePath('create_table.ejs'))
     );
 
-    mkdirp(this.destinationPath(this.props.dbname + '/tables'));
+    mkdirp(this.destinationPath(this.props.dbname + '/tables/'
+                       + (this.props.useschema ? (this.props.schemaname + '/') : '')));
 
     this.props.eol = os.EOL;
 
