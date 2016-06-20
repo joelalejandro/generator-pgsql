@@ -1,5 +1,6 @@
 # generator-pgsql
 [![npm version](https://badge.fury.io/js/generator-pgsql.svg)](https://badge.fury.io/js/generator-pgsql)
+[![dependency status](https://david-dm.org/joelalejandro/generator-pgsql.svg)](https://david-dm.org/joelalejandro/generator-pgsql)
 
 A Yeoman generator for PostgreSQL database scripts.
 
