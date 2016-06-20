@@ -1,7 +1,13 @@
+require('module-alias/register');
+
 var generators = require('yeoman-generator');
 var _ = require('lodash');
 var mkdirp = require('mkdirp');
 var os = require('os');
+
+var ifNotDatabase = require('/utils/if-not-database');
+var writeScript = require('/utils/write-script');
+var sharedInput = require('/utils/shared-input');
 
 module.exports = generators.Base.extend({
 
@@ -12,15 +18,7 @@ module.exports = generators.Base.extend({
 
     this.props = {};
 
-    if (typeof this.config.get('dbname') === 'undefined') {
-      this.log(_.repeat('-', 75));
-      this.log('Apparently you have not run "yo pgsql" yet. A function script cannot');
-      this.log('be created, because with no database name, such script is useless.')
-      this.log(_.repeat('-', 75));
-      this.env.error('Function script file cannot be created.')
-    } else {
-      this.props.dbname = this.config.get('dbname');
-    }
+    ifNotDatabase(this, 'function');
 
     if (this.functionname !== undefined) {
       this.functionname = _.snakeCase(this.functionname);
@@ -34,42 +32,9 @@ module.exports = generators.Base.extend({
   _askFunctionData: function() {
     var that = this;
     return this.prompt([
-      {
-        type: 'input',
-        name: 'functionname',
-        message: 'What\'s the name of the function?',
-        default: this.functionname,
-        validate: function(functionname) {
-          if (functionname === '') {
-            return 'A function name is required';
-          }
-
-          if (functionname.indexOf(' ') > -1) {
-            return 'A function name cannot contain spaces.';
-          }
-
-          return true;
-        }
-      },
-      {
-        type: 'confirm',
-        name: 'useschema',
-        message: function(response) {
-          return 'Do you want "' + response.functionname + '" to reside in a schema?';
-        },
-        default: false
-      },
-      {
-        type: 'input',
-        name: 'schemaname',
-        message: 'Enter the schema\'s name:',
-        validate: function(schemaname) {
-          return schemaname !== '' || 'A schema name is required.';
-        },
-        when: function(response) {
-          return response.useschema;
-        }
-      }
+      sharedInput.entityName('function', this.functionname),
+      sharedInput.useSchema('function'),
+      sharedInput.schemaName
     ]).then(function(props) {
       that.props.functionname = props.functionname;
       that.props.useschema = props.useschema;
@@ -174,17 +139,14 @@ module.exports = generators.Base.extend({
   },
 
   writing: function() {
-    var functionscriptfile = this.props.dbname + '/functions/'
-                           + (this.props.useschema ? (this.props.schemaname + '/') : '')
-                           + this.props.functionname + '.sql';
-    var template = _.template(
-      this.fs.read(this.templatePath('create_function.ejs'))
-    );
-    this.props.eol = os.EOL;
-
-    mkdirp(this.destinationPath(this.props.dbname + '/functions/'
-                       + (this.props.useschema ? (this.props.schemaname + '/') : '')));
-
-    this.fs.write(this.destinationPath(functionscriptfile), template(this.props));
+    writeScript(this, {
+      databaseName: this.props.dbname,
+      entityCollection: 'functions',
+      useSchema: this.props.useschema,
+      schemaName: this.props.schemaname,
+      entityName: this.props.functionname,
+      scriptType: 'sql',
+      templateName: 'create_function'
+    });
   }
 })

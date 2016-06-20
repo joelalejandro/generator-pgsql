@@ -1,6 +1,12 @@
+require('module-alias/register');
+
 var generators = require('yeoman-generator');
 var _ = require('lodash');
 var mkdirp = require('mkdirp');
+
+var ifNotDatabase = require('/utils/if-not-database');
+var writeScript = require('/utils/write-script');
+var sharedInput = require('/utils/shared-input');
 
 module.exports = generators.Base.extend({
 
@@ -11,13 +17,7 @@ module.exports = generators.Base.extend({
 
     this.props = {};
 
-    if (typeof this.config.get('dbname') === 'undefined') {
-      this.log(_.repeat('-', 75));
-      this.log('Apparently you have not run "yo pgsql" yet. A schema script cannot');
-      this.log('be created, because with no database name, such script is useless.')
-      this.log(_.repeat('-', 75));
-      this.env.error('Schema script file cannot be created.')
-    }
+    ifNotDatabase(this, 'schema');
 
     if (this.schemaname !== undefined) {
       this.schemaname = _.snakeCase(this.schemaname);
@@ -27,15 +27,7 @@ module.exports = generators.Base.extend({
   prompting: function() {
     var that = this;
     return this.prompt([
-      {
-        type: 'input',
-        name: 'schemaname',
-        message: 'What\'s the name of the schema?',
-        default: this.schemaname,
-        validate: function(schemaname) {
-          return schemaname !== '' || 'A table name is required.';
-        }
-      },
+      sharedInput.entityName('schema', this.schemaname),
       {
         type: 'confirm',
         name: 'restrict',
@@ -50,13 +42,12 @@ module.exports = generators.Base.extend({
   },
 
   writing: function() {
-    var schemascriptfile = this.props.dbname + '/schemas/' + this.props.schemaname + '.sql';
-    var template = _.template(
-      this.fs.read(this.templatePath('create_schema.ejs'))
-    );
-
-    mkdirp(this.destinationPath(this.props.dbname + '/schemas'));
-
-    this.fs.write(this.destinationPath(schemascriptfile), template(this.props));
+    writeScript(this, {
+      databaseName: this.props.dbname,
+      entityCollection: 'schemas',
+      entityName: this.props.schemaname,
+      scriptType: 'sql',
+      templateName: 'create_schema'
+    });
   }
 })

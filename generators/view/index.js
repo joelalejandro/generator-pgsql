@@ -1,6 +1,12 @@
+require('module-alias/register');
+
 var generators = require('yeoman-generator');
 var _ = require('lodash');
 var mkdirp = require('mkdirp');
+
+var ifNotDatabase = require('/utils/if-not-database');
+var writeScript = require('/utils/write-script');
+var sharedInput = require('/utils/shared-input');
 
 module.exports = generators.Base.extend({
 
@@ -11,15 +17,7 @@ module.exports = generators.Base.extend({
 
     this.props = {};
 
-    if (typeof this.config.get('dbname') === 'undefined') {
-      this.log(_.repeat('-', 75));
-      this.log('Apparently you have not run "yo pgsql" yet. A view script cannot');
-      this.log('be created, because with no database name, such script is useless.')
-      this.log(_.repeat('-', 75));
-      this.env.error('View script file cannot be created.')
-    } else {
-      this.props.dbname = this.config.get('dbname');
-    }
+    ifNotDatabase(this, 'view');
 
     if (this.viewname !== undefined) {
       this.viewname = _.snakeCase(this.viewname);
@@ -29,61 +27,23 @@ module.exports = generators.Base.extend({
   prompting: function() {
     var that = this;
     return this.prompt([
-      {
-        type: 'input',
-        name: 'viewname',
-        message: 'What\'s the name of the view?',
-        default: this.viewname,
-        validate: function(viewname) {
-          if (viewname === '') {
-            return 'A view name is required';
-          }
-
-          if (viewname.indexOf(' ') > -1) {
-            return 'A view name cannot contain spaces.';
-          }
-
-          return true;
-        }
-      },
-      {
-        type: 'confirm',
-        name: 'useschema',
-        message: function(response) {
-          return 'Do you want "' + response.viewname + '" to reside in a schema?';
-        },
-        default: false
-      },
-      {
-        type: 'input',
-        name: 'schemaname',
-        message: 'Enter the schema\'s name:',
-        validate: function(schemaname) {
-          return schemaname !== '' || 'A schema name is required.';
-        },
-        when: function(response) {
-          return response.useschema;
-        }
-      }
+      sharedInput.entityName('view', this.viewname),
+      sharedInput.useSchema('view'),
+      sharedInput.schemaName
     ]).then(function(props) {
-      that.props.viewname = props.viewname;
-      that.props.useschema = props.useschema;
-      that.props.schemaname = props.schemaname;
+      that.props = props;
     });
   },
 
   writing: function() {
-    var viewscriptfile = this.props.dbname + '/views/'
-                       + (this.props.useschema ? (this.props.schemaname + '/') : '')
-                       + this.props.viewname + '.sql';
-
-    var template = _.template(
-      this.fs.read(this.templatePath('create_view.ejs'))
-    );
-
-    mkdirp(this.destinationPath(this.props.dbname + '/views/'
-                       + (this.props.useschema ? (this.props.schemaname + '/') : '')));
-
-    this.fs.write(this.destinationPath(viewscriptfile), template(this.props));
+    writeScript(this, {
+      databaseName: this.props.dbname,
+      entityCollection: 'views',
+      useSchema: this.props.useschema,
+      schemaName: this.props.schemaname,
+      entityName: this.props.viewname,
+      scriptType: 'sql',
+      templateName: 'create_view'
+    });
   }
 });

@@ -1,7 +1,13 @@
+require('module-alias/register');
+
 var generators = require('yeoman-generator');
 var _ = require('lodash');
 var mkdirp = require('mkdirp');
 var os = require('os');
+
+var ifNotDatabase = require('/utils/if-not-database');
+var writeScript = require('/utils/write-script');
+var sharedInput = require('/utils/shared-input');
 
 module.exports = generators.Base.extend({
 
@@ -21,13 +27,7 @@ module.exports = generators.Base.extend({
       foreignkeys: []
     };
 
-    if (typeof this.config.get('dbname') === 'undefined') {
-      this.log(_.repeat('-', 75));
-      this.log('Apparently you have not run "yo pgsql" yet. A table script cannot');
-      this.log('be created, because with no database name, such script is useless.')
-      this.log(_.repeat('-', 75));
-      this.env.error('Table script file cannot be created.')
-    }
+    ifNotDatabase(this, 'table');
 
     if (this.options.inherits && this.options.like) {
       this.env.error('You cannot use both --inherits and --like for CREATE TABLE.');
@@ -45,42 +45,9 @@ module.exports = generators.Base.extend({
   _askTableData: function() {
     var that = this;
     return this.prompt([
-      {
-        type: 'input',
-        name: 'tablename',
-        message: 'What\'s the name of the table?',
-        default: this.tablename,
-        validate: function(tablename) {
-          if (tablename === '') {
-            return 'A table name is required';
-          }
-
-          if (tablename.indexOf(' ') > -1) {
-            return 'A table name cannot contain spaces.';
-          }
-
-          return true;
-        }
-      },
-      {
-        type: 'confirm',
-        name: 'useschema',
-        message: function(response) {
-          return 'Do you want "' + response.tablename + '" to reside in a schema?';
-        },
-        default: false
-      },
-      {
-        type: 'input',
-        name: 'schemaname',
-        message: 'Enter the schema\'s name:',
-        validate: function(schemaname) {
-          return schemaname !== '' || 'A schema name is required.';
-        },
-        when: function(response) {
-          return response.useschema;
-        }
-      }
+      sharedInput.entityName('table', this.tablename),
+      sharedInput.useSchema('table'),
+      sharedInput.schemaName
     ]).then(function(props) {
       that.props.tablename = props.tablename;
       that.props.useschema = props.useschema;
@@ -258,19 +225,14 @@ module.exports = generators.Base.extend({
   },
 
   writing: function() {
-    var tblscriptfile = this.props.dbname + '/tables/'
-                           + (this.props.useschema ? (this.props.schemaname + '/') : '')
-                           + this.props.tablename + '.sql';
-
-    var template = _.template(
-      this.fs.read(this.templatePath('create_table.ejs'))
-    );
-
-    mkdirp(this.destinationPath(this.props.dbname + '/tables/'
-                       + (this.props.useschema ? (this.props.schemaname + '/') : '')));
-
-    this.props.eol = os.EOL;
-
-    this.fs.write(this.destinationPath(tblscriptfile), template(this.props));
+    writeScript(this, {
+      databaseName: this.props.dbname,
+      entityCollection: 'tables',
+      useSchema: this.props.useschema,
+      schemaName: this.props.schemaname,
+      entityName: this.props.tablename,
+      scriptType: 'sql',
+      templateName: 'create_table'
+    });
   }
 })

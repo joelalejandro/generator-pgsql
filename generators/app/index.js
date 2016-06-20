@@ -1,6 +1,10 @@
+require('module-alias/register');
+
 var generators = require('yeoman-generator');
 var _ = require('lodash');
 var mkdirp = require('mkdirp');
+
+var writeScript = require('/utils/write-script');
 
 module.exports = generators.Base.extend({
 
@@ -66,15 +70,15 @@ module.exports = generators.Base.extend({
   },
 
   writing: function() {
-    var dbscriptfile = this.props.dbname + '/db.sql';
-    var template = _.template(
-      this.fs.read(this.templatePath('create_database_and_role.ejs'))
-    );
+    writeScript(this, {
+      databaseName: this.props.dbname,
+      entityName: 'db',
+      scriptType: 'sql',
+      templateName: 'create_database_and_role'
+    });
+  },
 
-    mkdirp(this.destinationPath(this.props.dbname));
-
-    this.fs.write(this.destinationPath(dbscriptfile), template(this.props));
-
+  end: function() {
     this.config.set('dbname', this.props.dbname);
     this.config.set('username', this.props.username);
   }
