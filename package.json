@@ -11,7 +11,9 @@
     "glob": "^7.0.4",
     "lodash": "^4.13.1",
     "mkdirp": "^0.5.1",
+    "module-alias": "^1.0.10",
     "path-exists": "^3.0.0",
+    "printf": "^0.2.3",
     "read-dir": "^0.2.0",
     "read-file": "^0.2.0",
     "rmdir": "^1.2.0"
@@ -25,6 +27,9 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/joelalejandro/generator-pgsql.git"
+  },
+  "_moduleAliases": {
+    "/utils": "./utils"
   },
   "keywords": [
     "yeoman",
