@@ -1,6 +1,6 @@
 {
   "name": "generator-pgsql",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "A Yeoman generator for PostgreSQL database scripts.",
   "main": "app/index.js",
   "dependencies": {
