@@ -47,7 +47,7 @@ module.exports = generators.Base.extend({
       tables: this.destinationPath(build.dbname + '/tables/'),
       functions: this.destinationPath(build.dbname + '/functions/'),
       views: this.destinationPath(build.dbname + '/views/'),
-      sequences: this.destinationPath(build.dbname + '/sequences/');
+      sequences: this.destinationPath(build.dbname + '/sequences/')
     };
 
     build.databasescript = readFile.sync(path.db + '/db.sql').toString();
