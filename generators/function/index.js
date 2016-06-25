@@ -98,6 +98,9 @@ module.exports = wipeableGenerator.extend({
       name: 'language',
       message: 'In which language will you write the code for the function?',
       choices: [{
+        name: "Plain SQL",
+        value: "sql"
+      }, {
         name: "PL/pgSQL",
         value: "plpgsql"
       }, {
