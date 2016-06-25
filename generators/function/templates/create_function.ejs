@@ -1,5 +1,7 @@
 <% if (useschema) {%>-- @schema <%=schemaname%><% } %>
-DROP FUNCTION <%=(useschema ? (schemaname + '.') : '')%><%=functionname%>;
+DROP FUNCTION <%=(useschema ? (schemaname + '.') : '')%><%=functionname%>(
+<%=parameters.join(','+eol+'  ')%>
+);
 CREATE FUNCTION <%=(useschema ? (schemaname + '.') : '')%><%=functionname%>
 (
 <%=parameters.join(','+eol+'  ')%>
