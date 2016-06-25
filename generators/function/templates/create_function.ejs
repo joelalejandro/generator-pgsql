@@ -1,15 +1,18 @@
 <% if (useschema) {%>-- @schema <%=schemaname%><% } %>
-CREATE OR REPLACE FUNCTION <%=(useschema ? (schemaname + '.') : '')%><%=functionname%>
+DROP FUNCTION <%=(useschema ? (schemaname + '.') : '')%><%=functionname%>;
+CREATE FUNCTION <%=(useschema ? (schemaname + '.') : '')%><%=functionname%>
 (
 <%=parameters.join(','+eol+'  ')%>
 )
 <% if (returns) { %>RETURNS <%=returns%><% } %>
-AS $$
+AS <% if (language !== 'sql') {%>$$
 
 --
 -- Write your function code here.
 --
 
-$$
+$$<% } else { %>
+'SELECT something FROM somewhere'
+<% } %>
 LANGUAGE <%=language%>
 SECURITY <%=security%>;
