@@ -13,6 +13,7 @@ INHERITS (<%=inherits%>)
 ;
 <% foreignkeys.forEach(function(fk) { %>
 ALTER TABLE <%=(useschema ? (schemaname + '.') : '')%><%=tablename%>
-ADD CONSTRAINT <%=fk.name%> (<%=fk.sourcecolumns.join(',')%>)
+ADD CONSTRAINT <%=fk.name%>
+FOREIGN KEY (<%=fk.sourcecolumns.join(',')%>)
 REFERENCES <%=fk.table%> (<%=fk.destinationcolumns.join(',')%>);
 <% }); %>
